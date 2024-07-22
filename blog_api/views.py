@@ -14,11 +14,8 @@ class BlogListApiView(APIView):
         '''
         List all the Blog items for given requested user
         '''
-        author_id = request.data.get('author', None)
-
-        Blogs = Blog.objects.filter(author = author_id)
+        Blogs = Blog.objects.all()
         serializer = BlogSerializer(Blogs, many=True)
-        print(author_id, 'request user id ###############')
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # 2. Create
@@ -40,12 +37,12 @@ class BlogDetailApiView(APIView):
     # add permission to check if user is authenticated
     # permission_classes = [permissions.IsAuthenticated]
 
-    def get_object(self, blog_id, user_id):
+    def get_object(self, blog_id):
         '''
         Helper method to get the object with given blog_id, and user_id
         '''
         try:
-            return Blog.objects.get(id=blog_id, author = user_id)
+            return Blog.objects.get(id=blog_id)
         except Blog.DoesNotExist:
             return None
 
@@ -54,8 +51,7 @@ class BlogDetailApiView(APIView):
         '''
         Retrieves the Blog with given blog_id
         '''
-        author_id = request.data.get('author', None)
-        blog_instance = self.get_object(blog_id, author_id)
+        blog_instance = self.get_object(blog_id)
         if not blog_instance:
             return Response(
                 {"res": "Object with Blog id does not exists"},
@@ -70,8 +66,7 @@ class BlogDetailApiView(APIView):
         '''
         Updates the todo item with given blog_id if exists
         '''
-        author_id = request.data.get('author', None)
-        blog_instance = self.get_object(blog_id, author_id)
+        blog_instance = self.get_object(blog_id)
         if not blog_instance:
             return Response(
                 {"res": "Object with blog id does not exists"}, 
@@ -90,9 +85,7 @@ class BlogDetailApiView(APIView):
         '''
         Deletes the todo item with given blog_id if exists
         '''
-        author_id = request.data.get('author', None)
-        print(author_id, 'request user id ###############')
-        blog_instance = self.get_object(blog_id, author_id)
+        blog_instance = self.get_object(blog_id)
         if not blog_instance:
             return Response(
                 {"res": "Object with todo id does not exists"}, 
