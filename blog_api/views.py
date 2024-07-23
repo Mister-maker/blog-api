@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework import permissions
 from .models import Blog
 from .serializers import BlogSerializer
+from django.db.models import Q
 
 class BlogListApiView(APIView):
     # add permission to check if user is authenticated
@@ -14,7 +15,16 @@ class BlogListApiView(APIView):
         '''
         List all the Blog items for given requested user
         '''
-        Blogs = Blog.objects.all()
+        search_query = request.query_params.get('search', None)
+        
+        # Use search query parameter to filter blogs
+        if search_query:
+            Blogs = Blog.objects.filter(
+                Q(title__icontains=search_query) | Q(author__icontains=search_query)
+            )
+        else:
+            Blogs = Blog.objects.all()
+
         serializer = BlogSerializer(Blogs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -64,7 +74,7 @@ class BlogDetailApiView(APIView):
     # 4. Update
     def put(self, request, blog_id, *args, **kwargs):
         '''
-        Updates the todo item with given blog_id if exists
+        Updates the blog item with given blog_id if exists
         '''
         blog_instance = self.get_object(blog_id)
         if not blog_instance:
@@ -83,7 +93,7 @@ class BlogDetailApiView(APIView):
     # 5. Delete
     def delete(self, request, blog_id, *args, **kwargs):
         '''
-        Deletes the todo item with given blog_id if exists
+        Deletes the blog item with given blog_id if exists
         '''
         blog_instance = self.get_object(blog_id)
         if not blog_instance:
