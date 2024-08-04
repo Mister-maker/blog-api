@@ -25,7 +25,7 @@ class BlogListApiView(APIView):
         else:
             Blogs = Blog.objects.all()
 
-        serializer = BlogSerializer(Blogs, many=True)
+        serializer = BlogSerializer(Blogs, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # 2. Create
@@ -34,7 +34,7 @@ class BlogListApiView(APIView):
         Create the Blog with given Blog data
         '''
         data = request.data
-
+        
         serializer = BlogSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -68,7 +68,7 @@ class BlogDetailApiView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        serializer = BlogSerializer(blog_instance)
+        serializer = BlogSerializer(blog_instance, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     # 4. Update
