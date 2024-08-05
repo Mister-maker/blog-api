@@ -5,6 +5,10 @@ from rest_framework import permissions
 from .models import Blog
 from .serializers import BlogSerializer
 from django.db.models import Q
+import base64
+
+from django.core.files.base import ContentFile
+import json
 
 class BlogListApiView(APIView):
     # add permission to check if user is authenticated
@@ -35,6 +39,8 @@ class BlogListApiView(APIView):
         '''
         data = request.data
         
+        # print(request.data, '##############')
+
         serializer = BlogSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

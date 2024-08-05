@@ -2,19 +2,30 @@
 from rest_framework import serializers
 from .models import Blog, Author
 from django.contrib.sites.models import Site
+import base64
+from django.core.files.base import ContentFile
+import uuid
 
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = ["id", "name", "designation"]
 
+class Base64FileField(serializers.FileField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:'):
+            format, data = data.split(';base64,')
+            ext = format.split('/')[-1] 
+        return super().to_internal_value(ContentFile(base64.b64decode(data), name='{}.{}'.format(uuid.uuid4(), ext)))
+
+
 class BlogSerializer(serializers.ModelSerializer):
     author = AuthorSerializer()
-    blog_image = serializers.SerializerMethodField()
+    blog_image = Base64FileField()
 
     class Meta:
         model = Blog
-        fields = ["id", "title", "description", "blog_image", "timestamp", "updated", "author"]
+        fields = ["id", "title", "description", "timestamp", "author", "blog_image", "updated"]
 
     def get_blog_image(self, obj):
         request = self.context.get('request')

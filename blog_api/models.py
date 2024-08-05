@@ -20,7 +20,7 @@ class Blog(models.Model):
     updated = models.DateTimeField(auto_now = True, blank = True)
     author = models.ForeignKey(Author, on_delete = models.CASCADE, related_name='author', blank = True, null = True)
 
-    def __str__(self):
-        return self.title
+    # def __str__(self):
+    #     return self.title
     
 
