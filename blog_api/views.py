@@ -24,7 +24,7 @@ class BlogListApiView(APIView):
         # Use search query parameter to filter blogs
         if search_query:
             Blogs = Blog.objects.filter(
-                Q(title__icontains=search_query) | Q(auther__name__icontains=search_query)
+                Q(title__icontains=search_query) | Q(author__name__icontains=search_query)
             )
         else:
             Blogs = Blog.objects.all()
